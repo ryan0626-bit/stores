@@ -2,67 +2,106 @@ import React, { useEffect, useState } from "react";
 import { API } from "./config";
 import axios from "axios";
 import { v4 as uuid } from "uuid";
-import EditEmployee from "./Employee";
+import EditStore from "./Store";
+import Grid from "@material-ui/core/Grid";
+import Employees from "./Employees";
+import _ from "lodash";
 
 function App() {
+  const [stores, setStores] = useState([]);
   const [name, setName] = useState("");
-  const [company, setCompany] = useState("");
-  const [position, setPosition] = useState("");
-  const [employees, setEmployees] = useState([]);
+  const [employees, setEmployees] = useState("");
+  const [state, setState] = useState("");
+  const [totalEmployees, setTotalEmployees] = useState(0);
 
-  const getEmployees = async () => {
-    let endpoint = `${API}/employees`;
+  const [selectStore, setSelectStore] = useState(null);
+
+  const getStores = async () => {
+    let endpoint = `${API}/stores`;
     let response = await axios.get(endpoint);
-    setEmployees(response.data.employees);
+    setStores(response.data.stores);
   };
 
-  const addEmployee = async () => {
-    let endpoint = `${API}/employee`;
-    let payload = { name, company, position };
+  const addStore = async () => {
+    let endpoint = `${API}/store`;
+    let payload = { name, employees, state };
     let response = await axios.post(endpoint, payload);
-    setEmployees([...employees, response.data.employee]);
+    setStores([...stores, response.data.store]);
+  };
+
+  const handleSelectChange = (e) => {
+    let state = e.target.value;
+    let tempTotal = 0;
+    stores.forEach((store) => {
+      if (state === "all") {
+        tempTotal = tempTotal + parseInt(store.employees);
+      } else if (store.state === state) {
+        tempTotal = tempTotal + parseInt(store.employees);
+      }
+    });
+    setTotalEmployees(tempTotal);
+    // selectedState
   };
 
   useEffect(() => {
-    getEmployees();
+    getStores();
   }, []);
 
+  let states = _.uniq(stores.map((store) => store.state)).sort();
+
   return (
-    <>
-      <input
-        placeholder="Add Employee name here"
-        onChange={(e) => {
-          setName(e.target.value);
-        }}
-      />
-      <input
-        placeholder="Add Employee company here"
-        onChange={(e) => {
-          setCompany(e.target.value);
-        }}
-      />
-      <input
-        placeholder="Add Employee position here"
-        onChange={(e) => {
-          setPosition(e.target.value);
-        }}
-      />
-      <button variant="contained" color="primary" onClick={addEmployee}>
-        Add Employee Here
-      </button>
-      <ul>
-        {employees.map((employee) => (
-          <EditEmployee
-            getEmployees={getEmployees}
-            key={employee.id}
-            name={employee.name}
-            company={employee.company}
-            position={employee.position}
-            id={employee.id}
+    <div style={{ flexGrow: 1 }}>
+      <Grid container spacing={3}>
+        <Grid item xs={6}>
+          <input
+            placeholder="Add Store name here"
+            onChange={(e) => {
+              setName(e.target.value);
+            }}
           />
-        ))}
-      </ul>
-    </>
+          <input
+            placeholder="Add Store employees here"
+            onChange={(e) => {
+              setEmployees(e.target.value);
+            }}
+          />
+          <input
+            placeholder="Add Store state here"
+            onChange={(e) => {
+              setState(e.target.value);
+            }}
+          />
+          <button variant="contained" color="primary" onClick={addStore}>
+            Add Store Here
+          </button>
+          <select onChange={handleSelectChange}>
+            <option value="all">All</option>
+            {states.map((state) => (
+              <option key={state} value={state}>
+                {state}
+              </option>
+            ))}
+          </select>
+          {`Total Employees: ${totalEmployees}`}
+          <ul>
+            {stores.map((stores) => (
+              <EditStore
+                setSelectStore={setSelectStore}
+                getStores={getStores}
+                key={stores.id}
+                name={stores.name}
+                employees={stores.employees}
+                state={stores.state}
+                id={stores.id}
+              />
+            ))}
+          </ul>
+        </Grid>
+        <Grid item xs={6}>
+          {selectStore && <Employees storeId={selectStore} />}
+        </Grid>
+      </Grid>
+    </div>
   );
 }
 export default App;

@@ -36,19 +36,29 @@ const response = data => {
   \******************/
 /*! namespace exports */
 /*! export createEmployee [provided] [maybe used in index (runtime-defined)] [usage prevents renaming] */
+/*! export createStore [provided] [maybe used in index (runtime-defined)] [usage prevents renaming] */
 /*! export deleteEmployee [provided] [maybe used in index (runtime-defined)] [usage prevents renaming] */
-/*! export getEmployees [provided] [maybe used in index (runtime-defined)] [usage prevents renaming] */
+/*! export deleteStore [provided] [maybe used in index (runtime-defined)] [usage prevents renaming] */
+/*! export getAllEmployees [provided] [maybe used in index (runtime-defined)] [usage prevents renaming] */
+/*! export getStoreEmployees [provided] [maybe used in index (runtime-defined)] [usage prevents renaming] */
+/*! export getStores [provided] [maybe used in index (runtime-defined)] [usage prevents renaming] */
 /*! export updateEmployee [provided] [maybe used in index (runtime-defined)] [usage prevents renaming] */
+/*! export updateStore [provided] [maybe used in index (runtime-defined)] [usage prevents renaming] */
 /*! other exports [not provided] [maybe used in index (runtime-defined)] */
 /*! runtime requirements: __webpack_require__, __webpack_require__.n, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "updateEmployee": () => /* binding */ updateEmployee,
+/* harmony export */   "updateStore": () => /* binding */ updateStore,
+/* harmony export */   "createStore": () => /* binding */ createStore,
+/* harmony export */   "deleteStore": () => /* binding */ deleteStore,
+/* harmony export */   "getStores": () => /* binding */ getStores,
 /* harmony export */   "createEmployee": () => /* binding */ createEmployee,
-/* harmony export */   "deleteEmployee": () => /* binding */ deleteEmployee,
-/* harmony export */   "getEmployees": () => /* binding */ getEmployees
+/* harmony export */   "updateEmployee": () => /* binding */ updateEmployee,
+/* harmony export */   "getAllEmployees": () => /* binding */ getAllEmployees,
+/* harmony export */   "getStoreEmployees": () => /* binding */ getStoreEmployees,
+/* harmony export */   "deleteEmployee": () => /* binding */ deleteEmployee
 /* harmony export */ });
 /* harmony import */ var uuid__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! uuid */ "uuid");
 /* harmony import */ var uuid__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(uuid__WEBPACK_IMPORTED_MODULE_0__);
@@ -57,65 +67,143 @@ __webpack_require__.r(__webpack_exports__);
 ;
 
 
-const updateEmployee = async ({
+const updateStore = async ({
   body
 }) => {
   const {
     id,
     name,
-    company,
-    position
+    employees,
+    state
   } = JSON.parse(body);
-  await _models__WEBPACK_IMPORTED_MODULE_2__.EmployeeModel.update({
+  await _models__WEBPACK_IMPORTED_MODULE_2__.StoreModel.update({
     id
   }, {
     name,
-    company,
-    position
+    employees,
+    state
   });
   return (0,_helpers__WEBPACK_IMPORTED_MODULE_1__.response)({
     success: true
+  });
+};
+const createStore = async ({
+  body
+}) => {
+  const {
+    name,
+    employees,
+    state
+  } = JSON.parse(body);
+  let store = await _models__WEBPACK_IMPORTED_MODULE_2__.StoreModel.create({
+    id: (0,uuid__WEBPACK_IMPORTED_MODULE_0__.v4)(),
+    name,
+    employees,
+    state
+  });
+  return (0,_helpers__WEBPACK_IMPORTED_MODULE_1__.response)({
+    success: true,
+    store
+  });
+};
+const deleteStore = async ({
+  queryStringParameters
+}) => {
+  const {
+    id
+  } = queryStringParameters;
+  await _models__WEBPACK_IMPORTED_MODULE_2__.StoreModel.delete({
+    id
+  });
+  return (0,_helpers__WEBPACK_IMPORTED_MODULE_1__.response)({
+    success: true
+  });
+};
+const getStores = async () => {
+  const stores = await _models__WEBPACK_IMPORTED_MODULE_2__.StoreModel.scan().exec();
+  return (0,_helpers__WEBPACK_IMPORTED_MODULE_1__.response)({
+    success: true,
+    stores
   });
 };
 const createEmployee = async ({
   body
 }) => {
   const {
+    storeId,
     name,
-    company,
     position
   } = JSON.parse(body);
   let employee = await _models__WEBPACK_IMPORTED_MODULE_2__.EmployeeModel.create({
     id: (0,uuid__WEBPACK_IMPORTED_MODULE_0__.v4)(),
+    storeId,
     name,
-    company,
     position
   });
   return (0,_helpers__WEBPACK_IMPORTED_MODULE_1__.response)({
-    success: true,
     employee
   });
 };
-const deleteEmployee = async ({
-  queryStringParameters
+const updateEmployee = async ({
+  body
 }) => {
   const {
+    storeId,
+    id,
+    name,
+    position
+  } = JSON.parse(body);
+  await _models__WEBPACK_IMPORTED_MODULE_2__.EmployeeModel.update({
+    storeId,
     id
-  } = queryStringParameters;
-  await _models__WEBPACK_IMPORTED_MODULE_2__.EmployeeModel.delete({
-    id
+  }, {
+    name,
+    position
   });
   return (0,_helpers__WEBPACK_IMPORTED_MODULE_1__.response)({
     success: true
   });
 };
-const getEmployees = async () => {
+const getAllEmployees = async () => {
   const employees = await _models__WEBPACK_IMPORTED_MODULE_2__.EmployeeModel.scan().exec();
   return (0,_helpers__WEBPACK_IMPORTED_MODULE_1__.response)({
     success: true,
     employees
   });
 };
+const getStoreEmployees = async ({
+  queryStringParameters
+}) => {
+  const {
+    storeId
+  } = queryStringParameters;
+  const employees = await _models__WEBPACK_IMPORTED_MODULE_2__.EmployeeModel.query({
+    storeId
+  }).exec();
+  return (0,_helpers__WEBPACK_IMPORTED_MODULE_1__.response)({
+    success: true,
+    employees
+  });
+};
+const deleteEmployee = async ({
+  queryStringParameters
+}) => {
+  const {
+    storeId,
+    id
+  } = queryStringParameters;
+  await _models__WEBPACK_IMPORTED_MODULE_2__.EmployeeModel.delete({
+    storeId,
+    id
+  });
+  return (0,_helpers__WEBPACK_IMPORTED_MODULE_1__.response)({
+    success: true
+  });
+}; //createEmployee
+//updateEmployee
+//getAllEmployees
+//getStoreEmployees
+//deleteEmployee
 
 /***/ }),
 
@@ -125,18 +213,23 @@ const getEmployees = async () => {
   \*******************/
 /*! namespace exports */
 /*! export EmployeeModel [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export StoreModel [provided] [no usage info] [missing usage info prevents renaming] */
 /*! other exports [not provided] [no usage info] */
 /*! runtime requirements: __webpack_require__, __webpack_require__.n, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "StoreModel": () => /* binding */ StoreModel,
 /* harmony export */   "EmployeeModel": () => /* binding */ EmployeeModel
 /* harmony export */ });
 /* harmony import */ var dynamoose__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! dynamoose */ "dynamoose");
 /* harmony import */ var dynamoose__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(dynamoose__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var uuid__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! uuid */ "uuid");
+/* harmony import */ var uuid__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(uuid__WEBPACK_IMPORTED_MODULE_1__);
 ;
-const EmployeeSchema = new (dynamoose__WEBPACK_IMPORTED_MODULE_0___default().Schema)({
+
+const StoreSchema = new (dynamoose__WEBPACK_IMPORTED_MODULE_0___default().Schema)({
   id: {
     hashKey: true,
     required: true,
@@ -146,7 +239,27 @@ const EmployeeSchema = new (dynamoose__WEBPACK_IMPORTED_MODULE_0___default().Sch
     type: String,
     required: true
   },
-  company: {
+  employees: {
+    type: String,
+    required: true
+  },
+  state: {
+    type: String,
+    required: true
+  }
+});
+const EmployeeSchema = new (dynamoose__WEBPACK_IMPORTED_MODULE_0___default().Schema)({
+  storeId: {
+    hashKey: true,
+    required: true,
+    type: String
+  },
+  id: {
+    rangeKey: true,
+    required: true,
+    type: String
+  },
+  name: {
     type: String,
     required: true
   },
@@ -155,7 +268,8 @@ const EmployeeSchema = new (dynamoose__WEBPACK_IMPORTED_MODULE_0___default().Sch
     required: true
   }
 });
-const EmployeeModel = dynamoose__WEBPACK_IMPORTED_MODULE_0___default().model("employee", EmployeeSchema);
+const StoreModel = dynamoose__WEBPACK_IMPORTED_MODULE_0___default().model("store", StoreSchema);
+const EmployeeModel = dynamoose__WEBPACK_IMPORTED_MODULE_0___default().model('store-employee', EmployeeSchema);
 
 /***/ }),
 
